@@ -223,7 +223,7 @@ def set_cors_headers(response):
         # http://www.w3.org/TR/cors/#access-control-allow-methods-response-header
         response.headers[
             "Access-Control-Allow-Methods"
-        ] = "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+        ] = "GET, POST, PUT, DELETE, PATCH, OPTIONS, QUERY"
         response.headers["Access-Control-Max-Age"] = "3600"  # 1 hour cache
         if request.headers.get("Access-Control-Request-Headers") is not None:
             response.headers["Access-Control-Allow-Headers"] = request.headers[
@@ -379,10 +379,10 @@ def view_get():
     return jsonify(get_dict("url", "args", "headers", "origin"))
 
 
-@app.route("/anything", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "TRACE"])
+@app.route("/anything", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "TRACE", "QUERY"])
 @app.route(
     "/anything/<path:anything>",
-    methods=["GET", "POST", "PUT", "DELETE", "PATCH", "TRACE"],
+    methods=["GET", "POST", "PUT", "DELETE", "PATCH", "TRACE", "QUERY"],
 )
 def view_anything(anything=None):
     """Returns anything passed in request data.
@@ -482,6 +482,22 @@ def view_delete():
         get_dict("url", "args", "form", "data", "origin", "headers", "files", "json")
     )
 
+@app.route("/query", methods=("QUERY",))
+def view_query():
+    """The request's QUERY parameters.
+    ---
+    tags:
+      - HTTP Methods
+    produces:
+      - application/json
+    responses:
+      200:
+        description: The request's QUERY parameters.
+    """
+
+    return jsonify(
+        get_dict("url", "args", "form", "data", "origin", "headers", "files", "json")
+    )
 
 @app.route("/gzip")
 @filters.gzip
@@ -569,7 +585,7 @@ def _redirect(kind, n, external):
     )
 
 
-@app.route("/redirect-to", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "TRACE"])
+@app.route("/redirect-to", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "TRACE", "QUERY"])
 def redirect_to():
     """302/3XX Redirects to the given URL.
     ---
@@ -622,6 +638,18 @@ def redirect_to():
           name: status_code
           type: int
           required: false
+    query:
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - in: formData
+          name: url
+          type: string
+          required: true
+        - in: formData
+          name: status_code
+          type: int
+          required: false          
     responses:
       302:
         description: A redirection.
@@ -727,7 +755,7 @@ def stream_n_messages(n):
 
 
 @app.route(
-    "/status/<codes>", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "TRACE"]
+    "/status/<codes>", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "TRACE", "QUERY"]
 )
 def view_status_code(codes):
     """Return status code or random status code if more than one are given
@@ -777,7 +805,7 @@ def view_status_code(codes):
     return status_code(code)
 
 
-@app.route("/response-headers", methods=["GET", "POST"])
+@app.route("/response-headers", methods=["GET", "POST", "QUERY"])
 def response_headers():
     """Returns a set of response headers from the query string.
     ---
@@ -1192,7 +1220,7 @@ def digest_auth(
     return response
 
 
-@app.route("/delay/<delay>", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "TRACE"])
+@app.route("/delay/<delay>", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "TRACE", "QUERY"])
 def delay_response(delay):
     """Returns a delayed response (max of 10 seconds).
     ---
