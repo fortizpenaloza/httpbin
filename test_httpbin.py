@@ -125,7 +125,7 @@ class HttpbinTestCase(unittest.TestCase):
             return response.data
 
     def test_response_headers_simple(self):
-        supported_verbs = ['get', 'post']
+        supported_verbs = ['get', 'post', 'query']
         for verb in supported_verbs:
             method = getattr(self.app, verb)
             response = method('/response-headers?animal=dog')
@@ -134,7 +134,7 @@ class HttpbinTestCase(unittest.TestCase):
             assert json.loads(response.data.decode('utf-8'))['animal'] == 'dog'
 
     def test_response_headers_multi(self):
-        supported_verbs = ['get', 'post']
+        supported_verbs = ['get', 'post', 'query']
         for verb in supported_verbs:
             method = getattr(self.app, verb)
             response = method('/response-headers?animal=dog&animal=cat')
@@ -255,7 +255,7 @@ class HttpbinTestCase(unittest.TestCase):
         )
         self.assertEqual(
             response.headers.get('Access-Control-Allow-Methods'),
-            'GET, POST, PUT, DELETE, PATCH, OPTIONS'
+            'GET, POST, PUT, DELETE, PATCH, OPTIONS', 'QUERY'
         )
         self.assertEqual(
             response.headers.get('Access-Control-Max-Age'), '3600'
@@ -558,6 +558,7 @@ class HttpbinTestCase(unittest.TestCase):
             'DELETE',
             'PATCH',
             'TRACE',
+            'QUERY'
         ]
         for m in methods:
             response = self.app.open(path='/status/418', method=m)
