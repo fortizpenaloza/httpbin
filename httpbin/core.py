@@ -1339,7 +1339,7 @@ def decode_base64(value):
         return "Incorrect Base64 data try: SFRUUEJJTiBpcyBhd2Vzb21l"
 
 
-@app.route("/cache", methods=("GET",))
+@app.route("/cache", methods=("GET", "QUERY"))
 def cache():
     """Returns a 304 if an If-Modified-Since header or If-None-Match is present. Returns the same as a GET otherwise.
     ---
