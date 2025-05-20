@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+pid=0
+
+if [[ -z $HTTPBIN__COMMAND_SERVER_PORT ]]; then
+  HTTPBIN__COMMAND_SERVER_PORT=22222
+fi
+
+# SIGTERM-handler
+termination_handler() {
+  exit_status=0
+  if [ $pid -ne 0 ]; then
+    echo
+    echo 'SIGTERM received, shutting down the application'
+    echo "SHUTDOWN" | nc localhost $HTTPBIN__COMMAND_SERVER_PORT
+    wait "$pid"
+    exit_status=$?
+  fi
+  exit "$exit_status"
+}
+
+trap 'termination_handler' SIGTERM
+
+STRUCTURED_LOGGING=
+if [[ "$HTTPBIN__LOG_FORMAT" == "json" ]]; then
+    STRUCTURED_LOGGING=--enable-structured-logging
+fi
+
+httpbin start $STRUCTURED_LOGGING --enable-tcp-command-server=$HTTPBIN__COMMAND_SERVER_PORT "$@" &
+pid="$!"
+wait "$pid"

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+if [[ -z $HTTPBIN__COMMAND_SERVER_PORT ]]; then
+  HTTPBIN__COMMAND_SERVER_PORT=22222
+fi
+
+echo "HEALTHCHECK" | nc localhost "$HTTPBIN__COMMAND_SERVER_PORT"
