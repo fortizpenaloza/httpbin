@@ -1,16 +1,16 @@
-name: Build and Publish Pharo Docker Images
+name: Build and Publish Docker Images
 on:
   workflow_dispatch:
   push:
-    branches: 
-     - '**'
+    branches:
+      - '**'
     tags:
       - 'v*.*.*'
   pull_request:
 jobs:
-   build_and_publish:
+  build_and_publish:
     runs-on: ubuntu-latest
-    name: Build and Publish Docker images
+    name: Build and Publish Docker Images
     permissions:
       contents: read
       security-events: write
@@ -34,7 +34,7 @@ jobs:
       - name: Docker build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./docker/pharo
+          context: ./
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
